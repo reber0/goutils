@@ -4,7 +4,7 @@
  * @Date: 2022-06-01 23:13:37
  * @LastEditTime: 2023-07-12 10:14:38
  */
-package pkg
+package goutils
 
 import (
 	"bufio"

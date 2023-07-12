@@ -4,7 +4,7 @@
  * @Date: 2022-04-28 10:26:09
  * @LastEditTime: 2023-07-12 10:18:39
  */
-package pkg
+package goutils
 
 import (
 	"reflect"

@@ -4,7 +4,7 @@
  * @Date: 2022-06-20 16:49:14
  * @LastEditTime: 2023-07-12 10:32:21
  */
-package pkg
+package goutils
 
 import (
 	"encoding/binary"

@@ -4,7 +4,7 @@
  * @Date: 2022-01-05 17:49:03
  * @LastEditTime: 2023-07-12 10:50:25
  */
-package pkg
+package goutils
 
 import (
 	"os"

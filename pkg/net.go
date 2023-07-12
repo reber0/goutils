@@ -4,7 +4,7 @@
  * @Date: 2022-06-01 23:13:08
  * @LastEditTime: 2023-07-12 10:16:24
  */
-package pkg
+package goutils
 
 import (
 	"bytes"

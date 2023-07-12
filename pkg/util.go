@@ -5,7 +5,7 @@
  * @LastEditTime: 2023-07-12 10:28:13
  */
 
-package pkg
+package goutils
 
 import (
 	"math/rand"

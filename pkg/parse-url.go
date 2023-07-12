@@ -4,7 +4,7 @@
  * @Date: 2022-02-21 16:51:19
  * @LastEditTime: 2023-07-12 10:57:37
  */
-package pkg
+package goutils
 
 import (
 	"fmt"

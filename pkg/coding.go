@@ -2,9 +2,9 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 09:42:42
- * @LastEditTime: 2023-07-12 10:54:53
+ * @LastEditTime: 2023-07-12 11:39:26
  */
-package pkg
+package goutils
 
 import (
 	"encoding/base64"

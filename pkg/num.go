@@ -4,7 +4,7 @@
  * @Date: 2023-07-12 10:08:10
  * @LastEditTime: 2023-07-12 10:57:26
  */
-package pkg
+package goutils
 
 import "github.com/pkg/errors"
 
