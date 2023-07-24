@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-07-12 10:18:39
+ * @LastEditTime: 2023-07-24 17:17:32
  */
 package goutils
 
@@ -62,7 +62,7 @@ func UniqStringSlice(slc []string) []string {
 	result := make([]string, 0)
 	tempMap := make(map[string]bool, len(slc))
 	for _, e := range slc {
-		if tempMap[e] == false {
+		if !tempMap[e] {
 			tempMap[e] = true
 			result = append(result, e)
 		}
@@ -75,7 +75,7 @@ func UniqIntSlice(slc []int) []int {
 	result := make([]int, 0)
 	tempMap := make(map[int]bool, len(slc))
 	for _, e := range slc {
-		if tempMap[e] == false {
+		if !tempMap[e] {
 			tempMap[e] = true
 			result = append(result, e)
 		}

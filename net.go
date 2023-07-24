@@ -2,16 +2,18 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:08
- * @LastEditTime: 2023-07-12 10:16:24
+ * @LastEditTime: 2023-07-24 17:28:56
  */
 package goutils
 
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -37,12 +39,64 @@ func IsSiteAlive(url string) bool {
 	return false
 }
 
+// IsPortOpenSyn 判断端口是否 open
+func IsPortOpenSyn(ip, port string) bool {
+	var synAckReceived int
+	var tcpHeader struct {
+		SourcePort           uint16
+		DestinationPort      uint16
+		SequenceNumber       uint32
+		AcknowledgmentNumber uint32
+		DataOffset           uint8
+		Reserved             uint8
+		TCPFlags             uint8
+		WindowSize           uint16
+		Checksum             uint16
+		UrgentPointer        uint16
+	}
+
+	// 请求 3 次，减少错误判断的概率
+	for i := 0; i < 3; i++ {
+		// 创建 TCP 套接字
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), 1*time.Second)
+		if err != nil {
+			if strings.Contains(err.Error(), "i/o timeout") {
+				return false
+			}
+			if strings.Contains(err.Error(), "connect: connection refused") {
+				return false
+			}
+		} else {
+			// 接收响应数据包
+			data := make([]byte, 100)
+			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+			conn.Read(data)
+
+			// 解析 TCP 头部信息
+			buf := bytes.Buffer{}
+			buf.Write(data[:20])
+			binary.Read(&buf, binary.BigEndian, &tcpHeader)
+
+			if (tcpHeader.TCPFlags & 0x12) == 0x12 {
+				// 没有收到 SYN+ACK 响应,端口关闭
+			} else {
+				synAckReceived++
+			}
+		}
+
+		conn.Close()
+	}
+
+	if synAckReceived == 3 {
+		return true
+	} else {
+		return false
+	}
+}
+
 // IsValidIP 判断是否为合法 IP
 func IsValidIP(ip string) bool {
-	if net.ParseIP(ip) != nil {
-		return true
-	}
-	return false
+	return net.ParseIP(ip) != nil
 }
 
 // EncodeToUTF8 根据 resty 的 resp 获取 utf-8 编码的 html
