@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:08
- * @LastEditTime: 2023-07-24 17:28:56
+ * @LastEditTime: 2023-07-28 09:04:00
  */
 package goutils
 
@@ -58,7 +58,7 @@ func IsPortOpenSyn(ip, port string) bool {
 	// 请求 3 次，减少错误判断的概率
 	for i := 0; i < 3; i++ {
 		// 创建 TCP 套接字
-		conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), 1*time.Second)
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), 3*time.Second)
 		if err != nil {
 			if strings.Contains(err.Error(), "i/o timeout") {
 				return false
@@ -67,9 +67,13 @@ func IsPortOpenSyn(ip, port string) bool {
 				return false
 			}
 		} else {
+			// 使用半开技术
+			conn.Write([]byte{0x02})       // 发送 SYN 包建立连接
+			conn.Write([]byte{0x04, 0x02}) // 立即发送 RST 以关闭连接
+
 			// 接收响应数据包
 			data := make([]byte, 100)
-			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 			conn.Read(data)
 
 			// 解析 TCP 头部信息
