@@ -2,17 +2,17 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:08
- * @LastEditTime: 2023-07-28 09:04:00
+ * @LastEditTime: 2023-07-30 20:38:13
  */
 package goutils
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
@@ -21,22 +21,16 @@ import (
 	"golang.org/x/text/transform"
 )
 
-// IsSiteAlive 判断网站是否存活
-func IsSiteAlive(url string) bool {
-	client := resty.New()
-	client.SetTimeout(10 * time.Second)
-	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
-	resp, err := client.R().Get(url)
+// IsSiteLive 判断网站是否存活
+func IsSiteALive(url string) bool {
+	request, err := http.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
 		return false
 	}
-	if resp != nil {
-		statusCode := resp.StatusCode()
-		if statusCode == 200 {
-			return true
-		}
-	}
-	return false
+
+	client := http.Client{Timeout: 1 * time.Second}
+	_, err = client.Do(request)
+	return err == nil
 }
 
 // IsPortOpenSyn 判断端口是否 open

@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2023-07-12 10:28:13
+ * @LastEditTime: 2023-07-28 11:06:27
  */
 
 package goutils
@@ -16,13 +16,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-// RandomInt 获取区间中的一个随机整数，返回数字范围 [mai, max]
+// RandomInt 获取区间中的一个随机整数，返回数字范围 [min, max]
 func RandomInt(min, max int) int {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	return r.Intn(max-min+1) + min
 }
 
 // RandomString 获取指定长度的随机字符串(数字+大小写字母)
+//
 //	temStr := RandomString(12)
 //	fmt.Println(temStr) // 8Tb7VQqZ5gL4
 func RandomString(length int) string {
@@ -38,6 +39,7 @@ func RandomString(length int) string {
 }
 
 // Str2Unix 将时间字符串转化为东八区时间戳
+//
 //	timeStr := "2022-06-20 19:52:04"
 //	tt := Str2Unix(timeStr)
 //	fmt.Println(tt) // 1655725924
@@ -56,15 +58,16 @@ func Str2Unix(timeStr string) int64 {
 }
 
 // Unix2Str 时间戳转时间字符串
-// 	var t1 int = 1655725924
-// 	var t2 int64 = 1655725924
-// 	var t3 string = "1655725924"
-// 	timeStr1 := Unix2String(t1)
-// 	timeStr2 := Unix2String(t2)
-// 	timeStr3 := Unix2String(t3)
-// 	fmt.Println(timeStr1) // 2022-06-20 19:52:04
-// 	fmt.Println(timeStr2) // 2022-06-20 19:52:04
-// 	fmt.Println(timeStr3) // 2022-06-20 19:52:04
+//
+//	var t1 int = 1655725924
+//	var t2 int64 = 1655725924
+//	var t3 string = "1655725924"
+//	timeStr1, _ := Unix2String(t1)
+//	timeStr2, _ := Unix2String(t2)
+//	timeStr3, _ := Unix2String(t3)
+//	fmt.Println(timeStr1) // "2022-06-20 19:52:04"
+//	fmt.Println(timeStr2) // "2022-06-20 19:52:04"
+//	fmt.Println(timeStr3) // "2022-06-20 19:52:04"
 func Unix2Str(timestamp interface{}) (string, error) {
 	// 通过反射来判断是什么类型,下面的 case 分支匹配到了则执行相关的分支
 

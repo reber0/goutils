@@ -2,11 +2,12 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-07-24 17:17:32
+ * @LastEditTime: 2023-07-28 16:28:54
  */
 package goutils
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -23,13 +24,6 @@ func SliceListReverse(s [][]string) [][]string {
 // SliceToString []string 转为 string
 func SliceToString(slc []string) string {
 	return "[" + strings.Join(slc, ", ") + "]"
-}
-
-// SortSlice []string 排序
-func SortSlice(t []string) {
-	sort.Slice(t, func(i, j int) bool {
-		return t[i] < t[j]
-	})
 }
 
 // InSlice 判断 needle 是否在 slice, array, map 中
@@ -57,27 +51,50 @@ func InSlice(needle interface{}, haystack interface{}) bool {
 	return false
 }
 
-// UniqStringSlice []string 去重
-func UniqStringSlice(slc []string) []string {
-	result := make([]string, 0)
-	tempMap := make(map[string]bool, len(slc))
-	for _, e := range slc {
-		if !tempMap[e] {
-			tempMap[e] = true
-			result = append(result, e)
+// SortIntSlice []int 排序
+func SortIntSlice(t []int) {
+	sort.Slice(t, func(i, j int) bool {
+		return t[i] < t[j]
+	})
+}
+
+// SortStringSlice []string 排序
+func SortStringSlice(t []string) {
+	sort.Slice(t, func(i, j int) bool {
+		return t[i] < t[j]
+	})
+}
+
+// UniqSlice
+//
+//	对 []int、[]string 去重
+func UniqSlice[T comparable](slc []T) []T {
+	result := make([]T, 0)
+	tmp := make(map[T]bool)
+	for _, v := range slc {
+		if !tmp[v] {
+			tmp[v] = true
+			result = append(result, v)
 		}
 	}
 	return result
 }
 
-// UniqIntSlice []int 去重
-func UniqIntSlice(slc []int) []int {
-	result := make([]int, 0)
-	tempMap := make(map[int]bool, len(slc))
-	for _, e := range slc {
-		if !tempMap[e] {
-			tempMap[e] = true
-			result = append(result, e)
+// UniqSlice2D
+//
+//	对 [][]int、[][]string 去重
+func UniqSlice2D[T comparable](slc [][]T) [][]T {
+	result := make([][]T, 0)
+	tmp := make(map[string]bool) // 使用 string 替代 []T 作为 key
+	for _, v := range slc {
+		key := ""
+		for _, item := range v {
+			key += fmt.Sprint(item) + ","
+		}
+		key = key[:len(key)-1]
+		if !tmp[key] {
+			tmp[key] = true
+			result = append(result, v)
 		}
 	}
 	return result
