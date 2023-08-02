@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-07-28 16:28:54
+ * @LastEditTime: 2023-08-02 11:33:30
  */
 package goutils
 
@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // SliceListReverse 反转 [][]string
@@ -26,21 +28,20 @@ func SliceToString(slc []string) string {
 	return "[" + strings.Join(slc, ", ") + "]"
 }
 
-// InSlice 判断 needle 是否在 slice, array, map 中
-func InSlice(needle interface{}, haystack interface{}) bool {
-	// https://github.com/syyongx/php2go/blob/master/php.go#L1265
-
-	val := reflect.ValueOf(haystack)
+// IsInCol 判断 elem 是否在 collection(slice, array, map) 中
+// https://github.com/syyongx/php2go/blob/master/php.go#L1265
+func IsInCol(collection interface{}, elem interface{}) bool {
+	val := reflect.ValueOf(collection)
 	switch val.Kind() {
 	case reflect.Slice, reflect.Array:
 		for i := 0; i < val.Len(); i++ {
-			if reflect.DeepEqual(needle, val.Index(i).Interface()) {
+			if reflect.DeepEqual(elem, val.Index(i).Interface()) {
 				return true
 			}
 		}
 	case reflect.Map:
 		for _, k := range val.MapKeys() {
-			if reflect.DeepEqual(needle, val.MapIndex(k).Interface()) {
+			if reflect.DeepEqual(elem, k.Interface()) {
 				return true
 			}
 		}
@@ -98,4 +99,37 @@ func UniqSlice2D[T comparable](slc [][]T) [][]T {
 		}
 	}
 	return result
+}
+
+// Num2Float64 : accept numeric types, return float64-value
+// https://github.com/signintech/gopdf/blob/master/gopdf.go#L862
+func Num2Float64(size interface{}) (fontSize float64, err error) {
+	switch size := size.(type) {
+	case float32:
+		return float64(size), nil
+	case float64:
+		return float64(size), nil
+	case int:
+		return float64(size), nil
+	case int16:
+		return float64(size), nil
+	case int32:
+		return float64(size), nil
+	case int64:
+		return float64(size), nil
+	case int8:
+		return float64(size), nil
+	case uint:
+		return float64(size), nil
+	case uint16:
+		return float64(size), nil
+	case uint32:
+		return float64(size), nil
+	case uint64:
+		return float64(size), nil
+	case uint8:
+		return float64(size), nil
+	default:
+		return 0.0, errors.Errorf("Num be of type (u)int* or float*, not %T", size)
+	}
 }
