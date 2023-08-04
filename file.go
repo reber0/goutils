@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:37
- * @LastEditTime: 2023-07-12 10:14:38
+ * @LastEditTime: 2023-08-04 15:30:22
  */
 package goutils
 
@@ -37,17 +37,8 @@ func FileEachLineRead(filename string) []string {
 	return datas
 }
 
-// IsFileExist 判定文件是否存在
-func IsFileExist(path string) bool {
+// PathExists 判定 文件/文件夹 是否存在
+func PathExists(path string) bool {
 	_, err := os.Stat(path)
-	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		if os.IsNotExist(err) {
-			return false
-		}
-		panic(err)
-	}
-	return true
+	return err == nil
 }
