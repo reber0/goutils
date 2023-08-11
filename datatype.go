@@ -2,18 +2,19 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-08-11 11:38:31
+ * @LastEditTime: 2023-08-11 14:23:00
  */
 package goutils
 
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"sort"
 
+	"github.com/bitly/go-simplejson"
 	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 	"golang.org/x/exp/constraints"
 )
 
@@ -26,8 +27,13 @@ func SliceListReverse(s [][]string) [][]string {
 }
 
 // jsonStr 转为 gjson.Result
-func JsonStr2Go(jsonStr string) interface{} {
-	return gjson.Parse(jsonStr).Value()
+func JsonStr2Go(jsonStr string) *simplejson.Json {
+	sJson, err := simplejson.NewJson([]byte(jsonStr))
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return sJson
 }
 
 // Go 格式转为 JsonStr
