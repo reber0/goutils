@@ -2,13 +2,14 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2023-07-28 11:06:27
+ * @LastEditTime: 2023-08-11 11:11:40
  */
 
 package goutils
 
 import (
 	"math/rand"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -69,21 +70,23 @@ func Str2Unix(timeStr string) int64 {
 //	fmt.Println(timeStr2) // "2022-06-20 19:52:04"
 //	fmt.Println(timeStr3) // "2022-06-20 19:52:04"
 func Unix2Str(timestamp interface{}) (string, error) {
-	// 通过反射来判断是什么类型,下面的 case 分支匹配到了则执行相关的分支
+	tmp := reflect.ValueOf(timestamp)
 
 	var t int64
-
-	switch timestamp := timestamp.(type) {
-	case int:
-		return time.Unix(int64(timestamp), 0).Format("2006-01-02 15:04:05"), nil
-	case int64:
-		return time.Unix(timestamp, 0).Format("2006-01-02 15:04:05"), nil
-	case string:
-		t, _ = strconv.ParseInt(timestamp, 10, 64) // 转为 int64
-		return time.Unix(t, 0).Format("2006-01-02 15:04:05"), nil
+	switch tmp.Kind() {
+	case reflect.Int, reflect.Float64:
+		t = tmp.Int()
+	case reflect.String:
+		parsedInt, err := strconv.ParseInt(tmp.String(), 10, 64) // 转为 int64
+		if err != nil {
+			return "", errors.Errorf("timestamp must be of type int* or float* or string, not %T", timestamp)
+		}
+		t = parsedInt
 	default:
-		return "0", errors.Errorf("fontSize must be of type (u)int* or float*, not %T", timestamp)
+		return "", errors.Errorf("timestamp must be of type int* or float* or string, not %T", timestamp)
 	}
+
+	return time.Unix(t, 0).Format("2006-01-02 15:04:05"), nil
 }
 
 // GetTermWidth 获取终端宽度
@@ -98,9 +101,8 @@ func GetTermWidth() int {
 }
 
 // GetRatio 获取两个 string 的相似度
+// https://github.com/syyongx/php2go/blob/master/php.go#L870
 func GetRatio(first string, second string) (percent float64) {
-	// https://github.com/syyongx/php2go/blob/master/php.go#L870
-
 	var similarText func(string, string, int, int) int
 	similarText = func(str1, str2 string, len1, len2 int) int {
 		var sum, max int

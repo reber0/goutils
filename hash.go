@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2023-07-12 10:39:10
+ * @LastEditTime: 2023-08-11 10:45:33
  */
 package goutils
 
@@ -45,20 +45,6 @@ func Sha512(plainText string) string {
 	return hex.EncodeToString(m.Sum(nil))
 }
 
-// PKCS7Padding AES padding
-func PKCS7Padding(ciphertext []byte, blockSize int) []byte {
-	padding := blockSize - len(ciphertext)%blockSize
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(ciphertext, padtext...)
-}
-
-// PKCS7UnPadding AES unpadding
-func PKCS7UnPadding(plainText []byte) []byte {
-	length := len(plainText)
-	unpadding := int(plainText[length-1])
-	return plainText[:(length - unpadding)]
-}
-
 // AesEncrypt AES 加密，CBC，key 的长度必须为 16, 24 或者 32
 func AesEncrypt(plainText, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
@@ -85,4 +71,18 @@ func AesDecrypt(cipherText, key []byte) ([]byte, error) {
 	blockMode.CryptBlocks(plainText, cipherText)
 	plainText = PKCS7UnPadding(plainText)
 	return plainText, nil
+}
+
+// PKCS7Padding AES padding
+func PKCS7Padding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(ciphertext, padtext...)
+}
+
+// PKCS7UnPadding AES unpadding
+func PKCS7UnPadding(plainText []byte) []byte {
+	length := len(plainText)
+	unpadding := int(plainText[length-1])
+	return plainText[:(length - unpadding)]
 }

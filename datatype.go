@@ -2,17 +2,18 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-08-02 11:33:30
+ * @LastEditTime: 2023-08-11 10:52:01
  */
 package goutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
-	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
+	"golang.org/x/exp/constraints"
 )
 
 // SliceListReverse 反转 [][]string
@@ -23,24 +24,34 @@ func SliceListReverse(s [][]string) [][]string {
 	return s
 }
 
-// SliceToString []string 转为 string
-func SliceToString(slc []string) string {
-	return "[" + strings.Join(slc, ", ") + "]"
+// jsonStr 转为 gjson.Result
+func JsonStr2Go(jsonStr string) interface{} {
+	return gjson.Parse(jsonStr).Value()
+}
+
+// Go 格式转为 JsonStr
+func Go2JsonStr(goData interface{}) (string, error) {
+	bGoData, err := json.Marshal(goData)
+	if err != nil {
+		return "", err
+	}
+	return string(bGoData), nil
 }
 
 // IsInCol 判断 elem 是否在 collection(slice, array, map) 中
 // https://github.com/syyongx/php2go/blob/master/php.go#L1265
 func IsInCol(collection interface{}, elem interface{}) bool {
-	val := reflect.ValueOf(collection)
-	switch val.Kind() {
+	c := reflect.ValueOf(collection)
+
+	switch c.Kind() {
 	case reflect.Slice, reflect.Array:
-		for i := 0; i < val.Len(); i++ {
-			if reflect.DeepEqual(elem, val.Index(i).Interface()) {
+		for i := 0; i < c.Len(); i++ {
+			if reflect.DeepEqual(elem, c.Index(i).Interface()) {
 				return true
 			}
 		}
 	case reflect.Map:
-		for _, k := range val.MapKeys() {
+		for _, k := range c.MapKeys() {
 			if reflect.DeepEqual(elem, k.Interface()) {
 				return true
 			}
@@ -52,15 +63,10 @@ func IsInCol(collection interface{}, elem interface{}) bool {
 	return false
 }
 
-// SortIntSlice []int 排序
-func SortIntSlice(t []int) {
-	sort.Slice(t, func(i, j int) bool {
-		return t[i] < t[j]
-	})
-}
-
-// SortStringSlice []string 排序
-func SortStringSlice(t []string) {
+// SortSlice
+//
+//	对 []int、[]string 排序
+func SortSlice[T constraints.Ordered](t []T) {
 	sort.Slice(t, func(i, j int) bool {
 		return t[i] < t[j]
 	})
@@ -69,7 +75,7 @@ func SortStringSlice(t []string) {
 // UniqSlice
 //
 //	对 []int、[]string 去重
-func UniqSlice[T comparable](slc []T) []T {
+func UniqSlice[T constraints.Ordered](slc []T) []T {
 	result := make([]T, 0)
 	tmp := make(map[T]bool)
 	for _, v := range slc {
@@ -101,35 +107,13 @@ func UniqSlice2D[T comparable](slc [][]T) [][]T {
 	return result
 }
 
+type Number interface {
+	float32 | float64 |
+		int | int16 | int32 | int64 | int8 |
+		uint | uint16 | uint32 | uint64 | uint8
+}
+
 // Num2Float64 : accept numeric types, return float64-value
-// https://github.com/signintech/gopdf/blob/master/gopdf.go#L862
-func Num2Float64(size interface{}) (fontSize float64, err error) {
-	switch size := size.(type) {
-	case float32:
-		return float64(size), nil
-	case float64:
-		return float64(size), nil
-	case int:
-		return float64(size), nil
-	case int16:
-		return float64(size), nil
-	case int32:
-		return float64(size), nil
-	case int64:
-		return float64(size), nil
-	case int8:
-		return float64(size), nil
-	case uint:
-		return float64(size), nil
-	case uint16:
-		return float64(size), nil
-	case uint32:
-		return float64(size), nil
-	case uint64:
-		return float64(size), nil
-	case uint8:
-		return float64(size), nil
-	default:
-		return 0.0, errors.Errorf("Num be of type (u)int* or float*, not %T", size)
-	}
+func Num2Float64[T Number](size T) (float64, error) {
+	return float64(size), nil
 }
