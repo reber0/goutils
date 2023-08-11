@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-08-11 10:52:01
+ * @LastEditTime: 2023-08-11 11:38:31
  */
 package goutils
 
@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"golang.org/x/exp/constraints"
 )
@@ -107,13 +108,34 @@ func UniqSlice2D[T comparable](slc [][]T) [][]T {
 	return result
 }
 
-type Number interface {
-	float32 | float64 |
-		int | int16 | int32 | int64 | int8 |
-		uint | uint16 | uint32 | uint64 | uint8
-}
-
 // Num2Float64 : accept numeric types, return float64-value
-func Num2Float64[T Number](size T) (float64, error) {
-	return float64(size), nil
+func Num2Float64(num interface{}) (float64, error) {
+	switch n := num.(type) {
+	case float32:
+		return float64(n), nil
+	case float64:
+		return float64(n), nil
+	case int:
+		return float64(n), nil
+	case int16:
+		return float64(n), nil
+	case int32:
+		return float64(n), nil
+	case int64:
+		return float64(n), nil
+	case int8:
+		return float64(n), nil
+	case uint:
+		return float64(n), nil
+	case uint16:
+		return float64(n), nil
+	case uint32:
+		return float64(n), nil
+	case uint64:
+		return float64(n), nil
+	case uint8:
+		return float64(n), nil
+	default:
+		return 0.0, errors.Errorf("Num be of type (u)int* or float*, not %T", n)
+	}
 }
