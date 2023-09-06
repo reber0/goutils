@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2023-08-11 10:45:33
+ * @LastEditTime: 2023-09-06 12:00:46
  */
 package goutils
 
@@ -18,30 +18,30 @@ import (
 )
 
 // Md5 加密
-func Md5(plainText string) string {
+func Md5(plainText []byte) string {
 	m := md5.New()
-	m.Write([]byte(plainText))
+	m.Write(plainText)
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha1 加密
-func Sha1(plainText string) string {
+func Sha1(plainText []byte) string {
 	m := sha1.New()
-	m.Write([]byte(plainText))
+	m.Write(plainText)
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha256 加密
-func Sha256(plainText string) string {
+func Sha256(plainText []byte) string {
 	m := sha256.New()
-	m.Write([]byte(plainText))
+	m.Write(plainText)
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha512 加密
-func Sha512(plainText string) string {
+func Sha512(plainText []byte) string {
 	m := sha512.New()
-	m.Write([]byte(plainText))
+	m.Write(plainText)
 	return hex.EncodeToString(m.Sum(nil))
 }
 
