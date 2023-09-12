@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2023-07-12 10:50:25
+ * @LastEditTime: 2023-09-12 11:20:05
  */
 package goutils
 
@@ -16,7 +16,7 @@ import (
 
 // MyLog 自定义 log
 type MyLog struct {
-	Log        *zap.Logger
+	zap.Logger
 	InfoFile   string // info 日志路径
 	ErrorFile  string // error 日志路径
 	ToConsole  bool   // 日志是否显示在 console
@@ -35,12 +35,12 @@ type MyLog struct {
 }
 
 // NewLog 初始化 MyLog
-// 	log := pkg.NewLog().Logger()
-// 	log.Info("info")
-// 	log.Error("error")
+//
+//	log := pkg.NewLog().L()
+//	log.Info("info")
+//	log.Error("error")
 func NewLog() *MyLog {
 	return &MyLog{
-		Log:        &zap.Logger{},
 		InfoFile:   "./logs/info.log",
 		ErrorFile:  "./logs/error.log",
 		ToConsole:  true,
@@ -59,8 +59,8 @@ func NewLog() *MyLog {
 	}
 }
 
-// Logger 返回 *zap.Logger
-func (mylog *MyLog) Logger() *zap.Logger {
+// L 返回 *zap.Logger
+func (mylog *MyLog) L() *zap.Logger {
 
 	var coreArr []zapcore.Core
 	if mylog.ToConsole && mylog.ToFile {
@@ -174,11 +174,11 @@ func (mylog *MyLog) IsCompress(value bool) *MyLog {
 func setConsole(mylog *MyLog) zapcore.Core {
 	// 配置终端日志显示格式，为普通文本格式
 	encoderConsole := zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
-		LevelKey:     mylog.LevelKey,
-		TimeKey:      mylog.TimeKey,
-		CallerKey:    mylog.CallerKey,
-		MessageKey:   mylog.MessageKey,
-		EncodeTime:   zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
+		LevelKey:   mylog.LevelKey,
+		TimeKey:    mylog.TimeKey,
+		CallerKey:  mylog.CallerKey,
+		MessageKey: mylog.MessageKey,
+		// EncodeTime:   zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
 		EncodeLevel:  zapcore.CapitalColorLevelEncoder, // 按级别显示不同颜色
 		EncodeCaller: zapcore.ShortCallerEncoder,       // 显示短文件路径
 	})
