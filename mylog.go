@@ -2,16 +2,28 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2023-09-12 11:20:05
+ * @LastEditTime: 2023-10-12 17:37:12
  */
 package goutils
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/mattn/go-colorable"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+)
+
+var stdout = colorable.NewColorableStderr()
+
+const (
+	red    = "\033[31m"
+	green  = "\033[32m"
+	yellow = "\033[33m"
+	blue   = "\033[34m"
+	reset  = "\033[0m"
 )
 
 // MyLog 自定义 log
@@ -169,6 +181,22 @@ func (mylog *MyLog) SetMaxAge(num int) *MyLog {
 func (mylog *MyLog) IsCompress(value bool) *MyLog {
 	mylog.Compress = value
 	return mylog
+}
+
+func (l *MyLog) Red(msg string) {
+	fmt.Fprintf(stdout, "%s%s%s\n", red, msg, reset)
+}
+
+func (l *MyLog) Green(msg string) {
+	fmt.Fprintf(stdout, "%s%s%s\n", green, msg, reset)
+}
+
+func (l *MyLog) Yellow(msg string) {
+	fmt.Fprintf(stdout, "%s%s%s\n", yellow, msg, reset)
+}
+
+func (l *MyLog) Blue(msg string) {
+	fmt.Fprintf(stdout, "%s%s%s\n", blue, msg, reset)
 }
 
 func setConsole(mylog *MyLog) zapcore.Core {
