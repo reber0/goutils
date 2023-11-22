@@ -2,17 +2,14 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 09:42:42
- * @LastEditTime: 2023-07-12 11:39:26
+ * @LastEditTime: 2023-11-16 19:49:53
  */
 package goutils
 
 import (
 	"encoding/base64"
-	"encoding/hex"
 	"net/url"
 	"regexp"
-	"strconv"
-	"strings"
 )
 
 // Base64Encode base64 编码
@@ -66,28 +63,4 @@ func HTMLEntityDecode(data string) string {
 	data = reg4.ReplaceAllString(data, "'")
 	data = reg5.ReplaceAllString(data, "\"")
 	return data
-}
-
-// Str2Unicode str 转 unicode
-func Str2Unicode(sText string) string {
-	textQuoted := strconv.QuoteToASCII(sText)
-	textUnquoted := textQuoted[1 : len(textQuoted)-1]
-	return textUnquoted
-}
-
-// Unicode2Str unicode 转 str
-func Unicode2Str(raw string) string {
-	str, _ := strconv.Unquote(strings.Replace(strconv.Quote(raw), `\\u`, `\u`, -1))
-	return str
-}
-
-// HexEncode 16 进制转 str
-func HexEncode(data string) string {
-	return hex.EncodeToString([]byte(data))
-}
-
-// HexDecode str 转 16进制
-func HexDecode(data string) string {
-	decoded, _ := hex.DecodeString(data)
-	return string(decoded)
 }

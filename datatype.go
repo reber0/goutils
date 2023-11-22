@@ -2,19 +2,15 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 10:26:09
- * @LastEditTime: 2023-08-11 14:23:00
+ * @LastEditTime: 2023-11-16 19:45:06
  */
 package goutils
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"sort"
 
-	"github.com/bitly/go-simplejson"
-	"github.com/pkg/errors"
 	"golang.org/x/exp/constraints"
 )
 
@@ -24,25 +20,6 @@ func SliceListReverse(s [][]string) [][]string {
 		s[i], s[j] = s[j], s[i]
 	}
 	return s
-}
-
-// jsonStr 转为 gjson.Result
-func JsonStr2Go(jsonStr string) *simplejson.Json {
-	sJson, err := simplejson.NewJson([]byte(jsonStr))
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
-	return sJson
-}
-
-// Go 格式转为 JsonStr
-func Go2JsonStr(goData interface{}) (string, error) {
-	bGoData, err := json.Marshal(goData)
-	if err != nil {
-		return "", err
-	}
-	return string(bGoData), nil
 }
 
 // IsInCol 判断 elem 是否在 collection(slice, array, map) 中
@@ -112,36 +89,4 @@ func UniqSlice2D[T comparable](slc [][]T) [][]T {
 		}
 	}
 	return result
-}
-
-// Num2Float64 : accept numeric types, return float64-value
-func Num2Float64(num interface{}) (float64, error) {
-	switch n := num.(type) {
-	case float32:
-		return float64(n), nil
-	case float64:
-		return float64(n), nil
-	case int:
-		return float64(n), nil
-	case int16:
-		return float64(n), nil
-	case int32:
-		return float64(n), nil
-	case int64:
-		return float64(n), nil
-	case int8:
-		return float64(n), nil
-	case uint:
-		return float64(n), nil
-	case uint16:
-		return float64(n), nil
-	case uint32:
-		return float64(n), nil
-	case uint64:
-		return float64(n), nil
-	case uint8:
-		return float64(n), nil
-	default:
-		return 0.0, errors.Errorf("Num be of type (u)int* or float*, not %T", n)
-	}
 }
