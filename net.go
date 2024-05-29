@@ -2,12 +2,13 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:08
- * @LastEditTime: 2023-07-30 20:38:13
+ * @LastEditTime: 2024-05-29 11:09:51
  */
 package goutils
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -90,6 +91,30 @@ func IsPortOpenSyn(ip, port string) bool {
 	} else {
 		return false
 	}
+}
+
+// 获取网站 TLS 证书版本
+func GetTLSVersion(url string) (string, error) {
+	client := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.TLS == nil {
+		return "Not using TLS", nil
+	}
+
+	return tls.VersionName(resp.TLS.Version), nil
 }
 
 // IsValidIP 判断是否为合法 IP
