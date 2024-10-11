@@ -1,6 +1,6 @@
 module github.com/reber0/goutils
 
-go 1.21
+go 1.23.2
 
 require (
 	github.com/bitly/go-simplejson v0.5.1
