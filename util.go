@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2023-08-11 11:11:40
+ * @LastEditTime: 2025-03-28 15:15:11
  */
 
 package goutils
@@ -74,7 +74,7 @@ func Unix2Str(timestamp interface{}) (string, error) {
 
 	var t int64
 	switch tmp.Kind() {
-	case reflect.Int, reflect.Float64:
+	case reflect.Int, reflect.Int64, reflect.Float64:
 		t = tmp.Int()
 	case reflect.String:
 		parsedInt, err := strconv.ParseInt(tmp.String(), 10, 64) // 转为 int64
