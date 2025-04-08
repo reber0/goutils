@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-11-16 19:44:41
- * @LastEditTime: 2023-11-22 08:59:18
+ * @LastEditTime: 2025-04-08 12:26:06
  */
 package goutils
 
@@ -43,12 +43,15 @@ func Unicode2Str(raw string) string {
 
 // jsonStr 转为 gjson.Result
 func JsonStr2Go(jsonStr string) *simplejson.Json {
-	sJson, err := simplejson.NewJson([]byte(jsonStr))
-	if err != nil {
-		log.Fatal(err)
-		return nil
+	if jsonStr != "" {
+		sJson, err := simplejson.NewJson([]byte(jsonStr))
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+		return sJson
 	}
-	return sJson
+	return nil
 }
 
 // Go 格式转为 JsonStr
