@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 09:42:42
- * @LastEditTime: 2023-11-16 19:49:53
+ * @LastEditTime: 2025-06-03 15:11:24
  */
 package goutils
 
@@ -19,7 +19,10 @@ func Base64Encode(data []byte) string {
 
 // Base64Decode base64 解码
 func Base64Decode(data string) []byte {
-	plainText, _ := base64.StdEncoding.DecodeString(data)
+	plainText, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		panic(err)
+	}
 	return plainText
 }
 
@@ -31,7 +34,10 @@ func URLEncode(data string) string {
 
 // URLDecode URL 解码
 func URLDecode(data string) string {
-	enEscapeURL, _ := url.QueryUnescape(data)
+	enEscapeURL, err := url.QueryUnescape(data)
+	if err != nil {
+		panic(err)
+	}
 	return enEscapeURL
 }
 

@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2023-09-06 12:00:46
+ * @LastEditTime: 2025-06-03 15:13:23
  */
 package goutils
 
@@ -49,7 +49,7 @@ func Sha512(plainText []byte) string {
 func AesEncrypt(plainText, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	blockSize := block.BlockSize()
 	plainText = PKCS7Padding(plainText, blockSize)
@@ -63,7 +63,7 @@ func AesEncrypt(plainText, key []byte) ([]byte, error) {
 func AesDecrypt(cipherText, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	blockSize := block.BlockSize()
 	blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])

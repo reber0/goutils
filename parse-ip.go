@@ -2,14 +2,13 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-20 16:49:14
- * @LastEditTime: 2023-07-12 10:32:21
+ * @LastEditTime: 2025-06-03 15:14:39
  */
 package goutils
 
 import (
 	"encoding/binary"
 	"fmt"
-	"log"
 	"net"
 	"regexp"
 	"strconv"
@@ -17,11 +16,12 @@ import (
 )
 
 // ParseIP 解析 ip 为列表（排除了 0 和 255）
-// 	target := "1.1.1.1,2.2.2.2-5,3.3.3.3/30"
-// 	ips := ParseIP(target)
-// 	// ips: [1.1.1.1
-// 	// 2.2.2.2 2.2.2.3 2.2.2.4 2.2.2.5
-// 	// 3.3.3.1 3.3.3.2 3.3.3.3]
+//
+//	target := "1.1.1.1,2.2.2.2-5,3.3.3.3/30"
+//	ips := ParseIP(target)
+//	// ips: [1.1.1.1
+//	// 2.2.2.2 2.2.2.3 2.2.2.4 2.2.2.5
+//	// 3.3.3.1 3.3.3.2 3.3.3.3]
 func ParseIP(target string) []string {
 	var ips []string
 
@@ -68,7 +68,7 @@ func parse1(s string) []string {
 	// convert string to IPNet struct
 	_, ipv4Net, err := net.ParseCIDR(s)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// convert IPNet struct mask and address to uint32

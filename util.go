@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-03-28 15:15:11
+ * @LastEditTime: 2025-06-03 15:19:20
  */
 
 package goutils
@@ -28,13 +28,16 @@ func RandomInt(min, max int) int {
 //	temStr := RandomString(12)
 //	fmt.Println(temStr) // 8Tb7VQqZ5gL4
 func RandomString(length int) string {
-	bStr := []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	charSet := []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-	result := []byte{}
-	rand.Seed(time.Now().UnixNano() + int64(rand.Intn(100)))
-	for i := 0; i < length; i++ {
-		s := bStr[rand.Intn(len(bStr))]
-		result = append(result, s)
+	result := make([]byte, length)
+
+	// 创建本地随机生成器（使用时间戳作为随机源）
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+
+	for i := range result {
+		result[i] = charSet[r.Intn(len(charSet))]
 	}
 	return string(result)
 }
@@ -47,12 +50,12 @@ func RandomString(length int) string {
 func Str2Unix(timeStr string) int64 {
 	local, err := time.LoadLocation("Asia/Shanghai") //设置时区
 	if err != nil {
-		return 0
+		panic(err)
 	}
 
 	tt, err := time.ParseInLocation("2006-01-02 15:04:05", timeStr, local)
 	if err != nil {
-		return 0
+		panic(err)
 	}
 
 	return tt.Unix()

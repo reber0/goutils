@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-21 16:51:19
- * @LastEditTime: 2023-07-12 10:57:37
+ * @LastEditTime: 2025-06-03 15:15:03
  */
 package goutils
 
@@ -22,7 +22,10 @@ type URL struct {
 
 // NewURL 解析 URL
 func NewURL(targetURL string) *URL {
-	urlObj, _ := url.Parse(targetURL)
+	urlObj, err := url.Parse(targetURL)
+	if err != nil {
+		panic(err)
+	}
 
 	return &URL{
 		u: urlObj,
@@ -83,7 +86,10 @@ func (p *URL) RawQuery() string {
 
 // MapQuery 获取 MapQuery
 func (p *URL) MapQuery() url.Values {
-	MapQuery, _ := url.ParseQuery(p.u.RawQuery)
+	MapQuery, err := url.ParseQuery(p.u.RawQuery)
+	if err != nil {
+		panic(err)
+	}
 	return MapQuery
 }
 
