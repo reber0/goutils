@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-06-03 15:19:20
+ * @LastEditTime: 2025-06-23 16:19:28
  */
 
 package goutils
@@ -26,19 +26,40 @@ func RandomInt(min, max int) int {
 // RandomString 获取指定长度的随机字符串(数字+大小写字母)
 //
 //	temStr := RandomString(12)
-//	fmt.Println(temStr) // 8Tb7VQqZ5gL4
+//	fmt.Println(temStr) // 7U8#+SgVNX+b
 func RandomString(length int) string {
-	charSet := []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	digits := "23456789"
+	lowerCase := "abcdefghijkmnpqrstuvwxyz"
+	upperCase := "ABCDEFGHJKLMNPQRSTUVWXYZ"
+	specialChars := "!@#$%^&*_-+="
+	allChars := digits + lowerCase + upperCase + specialChars
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano())) // 使用安全的随机数生成器
 
 	result := make([]byte, length)
 
-	// 创建本地随机生成器（使用时间戳作为随机源）
-	src := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(src)
-
-	for i := range result {
-		result[i] = charSet[r.Intn(len(charSet))]
+	// 如果长度小于4，自动调整为4
+	if length < 4 {
+		length = 4
 	}
+
+	// 生成必备字符
+	result[0] = digits[r.Intn(len(digits))]
+	result[1] = lowerCase[r.Intn(len(lowerCase))]
+	result[2] = upperCase[r.Intn(len(upperCase))]
+	result[3] = specialChars[r.Intn(len(specialChars))]
+
+	// 填充剩余字符
+	for i := 4; i < length; i++ {
+		result[i] = allChars[r.Intn(len(allChars))]
+	}
+
+	// 打乱字符顺序（Fisher-Yates算法）
+	for i := length - 1; i > 0; i-- {
+		j := r.Intn(i + 1)
+		result[i], result[j] = result[j], result[i]
+	}
+
 	return string(result)
 }
 
