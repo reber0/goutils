@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2025-06-26 13:26:12
+ * @LastEditTime: 2025-06-26 16:25:11
  */
 package goutils
 
@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/hmac"
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/sha1"
@@ -48,6 +49,13 @@ func Sha512(plainText []byte) string {
 	m := sha512.New()
 	m.Write(plainText)
 	return hex.EncodeToString(m.Sum(nil))
+}
+
+// 生成 HMAC-SHA256
+func HMACSHA256(key []byte, data []byte) []byte {
+	h := hmac.New(sha256.New, key)
+	h.Write(data)
+	return h.Sum(nil)
 }
 
 // AES-GCM 加密，返回加密后的数据（包含时间戳）
