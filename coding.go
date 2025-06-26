@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 09:42:42
- * @LastEditTime: 2025-06-03 15:11:24
+ * @LastEditTime: 2025-06-26 13:23:09
  */
 package goutils
 
@@ -18,12 +18,12 @@ func Base64Encode(data []byte) string {
 }
 
 // Base64Decode base64 解码
-func Base64Decode(data string) []byte {
+func Base64Decode(data string) ([]byte, error) {
 	plainText, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return plainText
+	return plainText, nil
 }
 
 // URLEncode URL 编码
@@ -33,12 +33,12 @@ func URLEncode(data string) string {
 }
 
 // URLDecode URL 解码
-func URLDecode(data string) string {
+func URLDecode(data string) (string, error) {
 	enEscapeURL, err := url.QueryUnescape(data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return enEscapeURL
+	return enEscapeURL, nil
 }
 
 // HTMLEntityEncode html 实体编码

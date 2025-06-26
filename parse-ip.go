@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-20 16:49:14
- * @LastEditTime: 2025-06-03 15:14:39
+ * @LastEditTime: 2025-06-26 13:28:35
  */
 package goutils
 
@@ -38,7 +38,12 @@ func ParseIP(target string) []string {
 	for _, s := range tmpS {
 		switch true {
 		case re1.MatchString(s):
-			ips = append(ips, parse1(s)...)
+			p, err := parse1(s)
+			if err != nil {
+				fmt.Println("Invalid CIDR", s, ":", err)
+				continue
+			}
+			ips = append(ips, p...)
 		case re2.MatchString(s):
 			reg := regexp.MustCompile(`(\d{1,3}\.\d{1,3}\.\d{1,3}\.)(\d{1,3})-(\d{1,3})`)
 			res := reg.FindStringSubmatch(s)
@@ -61,14 +66,14 @@ func ParseIP(target string) []string {
 }
 
 // 解析 CIDR 为 ip 列表
-func parse1(s string) []string {
+func parse1(s string) ([]string, error) {
 	// https://stackoverflow.com/questions/60540465/how-to-list-all-ips-in-a-network
 	var ips []string
 
 	// convert string to IPNet struct
 	_, ipv4Net, err := net.ParseCIDR(s)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("parse CIDR %s error: %v", s, err)
 	}
 
 	// convert IPNet struct mask and address to uint32
@@ -92,7 +97,7 @@ func parse1(s string) []string {
 		ips = append(ips, ipStr)
 	}
 
-	return ips
+	return ips, nil
 }
 
 // 解析 1.1.1.1-10 为 ip 列表

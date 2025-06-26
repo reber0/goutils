@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-11-16 19:44:41
- * @LastEditTime: 2025-06-03 15:10:17
+ * @LastEditTime: 2025-06-26 13:21:48
  */
 package goutils
 
@@ -22,12 +22,12 @@ func Str2Hex(data string) string {
 }
 
 // HexDecode str 转 16 进制字符串
-func Hex2Str(data string) string {
+func Hex2Str(data string) (string, error) {
 	decoded, err := hex.DecodeString(data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(decoded)
+	return string(decoded), nil
 }
 
 // Str2Unicode str 转 unicode
@@ -38,28 +38,28 @@ func Str2Unicode(sText string) string {
 }
 
 // Unicode2Str unicode 转 str
-func Unicode2Str(raw string) string {
+func Unicode2Str(raw string) (string, error) {
 	str, err := strconv.Unquote(strings.Replace(strconv.Quote(raw), `\\u`, `\u`, -1))
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return str
+	return str, nil
 }
 
 // jsonStr 转为 gjson.Result
-func JsonStr2Go(jsonStr string) *simplejson.Json {
+func JsonStr2Go(jsonStr string) (*simplejson.Json, error) {
 	sJson, err := simplejson.NewJson([]byte(jsonStr))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return sJson
+	return sJson, nil
 }
 
 // Go 格式转为 JsonStr
 func Go2JsonStr(goData interface{}) (string, error) {
 	bGoData, err := json.Marshal(goData)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	return string(bGoData), nil
 }
