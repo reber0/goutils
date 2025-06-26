@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2025-06-26 16:25:11
+ * @LastEditTime: 2025-06-26 16:34:14
  */
 package goutils
 
@@ -52,7 +52,7 @@ func Sha512(plainText []byte) string {
 }
 
 // 生成 HMAC-SHA256
-func HMACSHA256(key []byte, data []byte) []byte {
+func HMACSHA256(data []byte, key []byte) []byte {
 	h := hmac.New(sha256.New, key)
 	h.Write(data)
 	return h.Sum(nil)
