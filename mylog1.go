@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2025-06-30 16:25:16
+ * @LastEditTime: 2025-06-30 16:31:57
  */
 package goutils
 
@@ -300,7 +300,7 @@ func (mylog *Log) logWithLevel(level zapcore.Level, sep string, args ...interfac
 	msg := b.String()
 
 	// 根据日志级别记录
-	logger := mylog.L().WithOptions(zap.AddCallerSkip(1))
+	logger := mylog.L().WithOptions(zap.AddCallerSkip(2))
 	switch level {
 	case zapcore.DebugLevel:
 		if mylog.ToConsole || mylog.ToFile {
