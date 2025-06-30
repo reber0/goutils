@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2025-06-30 16:31:57
+ * @LastEditTime: 2025-06-30 16:33:11
  */
 package goutils
 
@@ -300,6 +300,7 @@ func (mylog *Log) logWithLevel(level zapcore.Level, sep string, args ...interfac
 	msg := b.String()
 
 	// 根据日志级别记录
+	// 添加 zap.AddCallerSkip(2) 跳过当前和上级封装层，指向实际调用位置，避免记录的错误行号不准确
 	logger := mylog.L().WithOptions(zap.AddCallerSkip(2))
 	switch level {
 	case zapcore.DebugLevel:
