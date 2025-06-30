@@ -2,12 +2,14 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2023-10-12 17:55:03
+ * @LastEditTime: 2025-06-30 11:06:51
  */
 package goutils
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
@@ -235,4 +237,82 @@ func setFile(mylog *MyLog) (zapcore.Core, zapcore.Core) {
 	errorFileCore := zapcore.NewCore(encoderFile, zapcore.NewMultiWriteSyncer(errorFileWriteSyncer), highPriority)
 
 	return infoFileCore, errorFileCore
+}
+
+// D Debug 级别日志输出（空格分隔）
+func (mylog *MyLog) D(args ...interface{}) {
+	mylog.logWithLevel(zapcore.DebugLevel, " ", args...)
+}
+
+// I Info 级别日志输出（空格分隔）
+func (mylog *MyLog) I(args ...interface{}) {
+	mylog.logWithLevel(zapcore.InfoLevel, " ", args...)
+}
+
+// W Warn 级别日志输出（空格分隔）
+func (mylog *MyLog) W(args ...interface{}) {
+	mylog.logWithLevel(zapcore.WarnLevel, " ", args...)
+}
+
+// E Error 级别日志输出（空格分隔）
+func (mylog *MyLog) E(args ...interface{}) {
+	mylog.logWithLevel(zapcore.ErrorLevel, " ", args...)
+}
+
+// DWithSep Debug 级别日志输出（自定义分隔符）
+func (mylog *MyLog) DWithSep(sep string, args ...interface{}) {
+	mylog.logWithLevel(zapcore.DebugLevel, sep, args...)
+}
+
+// IWithSep Info 级别日志输出（自定义分隔符）
+func (mylog *MyLog) IWithSep(sep string, args ...interface{}) {
+	mylog.logWithLevel(zapcore.InfoLevel, sep, args...)
+}
+
+// WWithSep Warn 级别日志输出（自定义分隔符）
+func (mylog *MyLog) WWithSep(sep string, args ...interface{}) {
+	mylog.logWithLevel(zapcore.WarnLevel, sep, args...)
+}
+
+// EWithSep Error 级别日志输出（自定义分隔符）
+func (mylog *MyLog) EWithSep(sep string, args ...interface{}) {
+	mylog.logWithLevel(zapcore.ErrorLevel, sep, args...)
+}
+
+// logWithLevel 内部实现方法，处理日志级别和分隔符
+func (mylog *MyLog) logWithLevel(level zapcore.Level, sep string, args ...interface{}) {
+	if len(args) == 0 {
+		return
+	}
+
+	// 处理多参数连接，连接多个参数为字符串
+	var b strings.Builder
+	for i, arg := range args {
+		if i > 0 {
+			b.WriteString(sep) // 添加分隔符
+		}
+		fmt.Fprint(&b, arg) // 格式化为字符串
+	}
+	msg := b.String()
+
+	// 根据日志级别记录
+	logger := mylog.L()
+	switch level {
+	case zapcore.DebugLevel:
+		if mylog.ToConsole || mylog.ToFile {
+			logger.Debug(msg)
+		}
+	case zapcore.InfoLevel:
+		if mylog.ToConsole || mylog.ToFile {
+			logger.Info(msg)
+		}
+	case zapcore.WarnLevel:
+		if mylog.ToConsole || mylog.ToFile {
+			logger.Warn(msg)
+		}
+	case zapcore.ErrorLevel:
+		if mylog.ToConsole || mylog.ToFile {
+			logger.Error(msg)
+		}
+	}
 }

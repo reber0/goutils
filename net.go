@@ -2,12 +2,13 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:08
- * @LastEditTime: 2024-05-29 11:09:51
+ * @LastEditTime: 2025-06-30 10:10:37
  */
 package goutils
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/binary"
 	"fmt"
@@ -24,14 +25,22 @@ import (
 
 // IsSiteLive 判断网站是否存活
 func IsSiteALive(url string) bool {
-	request, err := http.NewRequest(http.MethodHead, url, nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return false
 	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; SiteLiveCheck)")
 
-	client := http.Client{Timeout: 1 * time.Second}
-	_, err = client.Do(request)
-	return err == nil
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false // 网络级错误（超时/拒绝等）
+	}
+	defer resp.Body.Close()
+	return true // 任何HTTP响应状态码均视为存活
 }
 
 // IsPortOpenSyn 判断端口是否 open
