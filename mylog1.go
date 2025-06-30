@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-01-05 17:49:03
- * @LastEditTime: 2025-06-30 11:06:51
+ * @LastEditTime: 2025-06-30 11:14:36
  */
 package goutils
 
@@ -16,8 +16,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// MyLog 自定义 log
-type MyLog struct {
+// Log 自定义 log
+type Log struct {
 	zap.Logger
 	InfoFile   string // info 日志路径
 	ErrorFile  string // error 日志路径
@@ -36,13 +36,17 @@ type MyLog struct {
 	Compress   bool // 是否压缩处理
 }
 
-// NewLog 初始化 MyLog
+// NewLog 初始化 Log
 //
 //	log := pkg.NewLog().L()
 //	log.Info("info")
 //	log.Error("error")
-func NewLog() *MyLog {
-	return &MyLog{
+//
+//	log := pkg.NewLog()
+//	log.I("info:", "test")
+//	log.E("error:", "eeee")
+func NewLog() *Log {
+	return &Log{
 		InfoFile:   "./logs/info.log",
 		ErrorFile:  "./logs/error.log",
 		ToConsole:  true,
@@ -62,7 +66,7 @@ func NewLog() *MyLog {
 }
 
 // L 返回 *zap.Logger
-func (mylog *MyLog) L() *zap.Logger {
+func (mylog *Log) L() *zap.Logger {
 
 	var coreArr []zapcore.Core
 	if mylog.ToConsole && mylog.ToFile {
@@ -96,84 +100,84 @@ func (mylog *MyLog) L() *zap.Logger {
 }
 
 // SetInfoFile 设置 Info 日志路径
-func (mylog *MyLog) SetInfoFile(logfile string) *MyLog {
+func (mylog *Log) SetInfoFile(logfile string) *Log {
 	mylog.InfoFile = logfile
 	return mylog
 }
 
 // SetErrorFile 设置 Error 日志路径
-func (mylog *MyLog) SetErrorFile(logfile string) *MyLog {
+func (mylog *Log) SetErrorFile(logfile string) *Log {
 	mylog.ErrorFile = logfile
 	return mylog
 }
 
 // IsToConsole 日志输出到终端
-func (mylog *MyLog) IsToConsole(value bool) *MyLog {
+func (mylog *Log) IsToConsole(value bool) *Log {
 	mylog.ToConsole = value
 	return mylog
 }
 
 // IsToFile 日志输出到文件
-func (mylog *MyLog) IsToFile(value bool) *MyLog {
+func (mylog *Log) IsToFile(value bool) *Log {
 	mylog.ToFile = value
 	return mylog
 }
 
 // IsShowCaller 是否显示 Caller
-func (mylog *MyLog) IsShowCaller(value bool) *MyLog {
+func (mylog *Log) IsShowCaller(value bool) *Log {
 	mylog.ShowCaller = value
 	return mylog
 }
 
 // SetLevelKey 设置日志中 level 的 key
-func (mylog *MyLog) SetLevelKey(key string) *MyLog {
+func (mylog *Log) SetLevelKey(key string) *Log {
 	mylog.LevelKey = key
 	return mylog
 }
 
 // SetTimeKey 设置日志中 time 的 key
-func (mylog *MyLog) SetTimeKey(key string) *MyLog {
+func (mylog *Log) SetTimeKey(key string) *Log {
 	mylog.TimeKey = key
 	return mylog
 }
 
 // SetCallerKey 设置日志中 caller 的 key
-func (mylog *MyLog) SetCallerKey(key string) *MyLog {
+func (mylog *Log) SetCallerKey(key string) *Log {
 	mylog.CallerKey = key
 	return mylog
 }
 
 // SetMessageKey 设置日志中 message 的 key
-func (mylog *MyLog) SetMessageKey(key string) *MyLog {
+func (mylog *Log) SetMessageKey(key string) *Log {
 	mylog.MessageKey = key
 	return mylog
 }
 
 // SetMaxSize 设置日志文件的大小
-func (mylog *MyLog) SetMaxSize(size int) *MyLog {
+func (mylog *Log) SetMaxSize(size int) *Log {
 	mylog.MaxSize = size
 	return mylog
 }
 
 // SetMaxBackups 设置日志文件的留存个数
-func (mylog *MyLog) SetMaxBackups(num int) *MyLog {
+func (mylog *Log) SetMaxBackups(num int) *Log {
 	mylog.MaxBackups = num
 	return mylog
 }
 
 // SetMaxAge 设置日志文件的留存天数
-func (mylog *MyLog) SetMaxAge(num int) *MyLog {
+func (mylog *Log) SetMaxAge(num int) *Log {
 	mylog.MaxAge = num
 	return mylog
 }
 
 // IsCompress 日志文件是否压缩存储
-func (mylog *MyLog) IsCompress(value bool) *MyLog {
+func (mylog *Log) IsCompress(value bool) *Log {
 	mylog.Compress = value
 	return mylog
 }
 
-func setConsole(mylog *MyLog) zapcore.Core {
+func setConsole(mylog *Log) zapcore.Core {
 	// 配置终端日志显示格式，为普通文本格式
 	encoderConsole := zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
 		LevelKey:   mylog.LevelKey,
@@ -195,7 +199,7 @@ func setConsole(mylog *MyLog) zapcore.Core {
 	return consoleCore
 }
 
-func setFile(mylog *MyLog) (zapcore.Core, zapcore.Core) {
+func setFile(mylog *Log) (zapcore.Core, zapcore.Core) {
 	// 配置日志文件中日志的格式，为 json 格式
 	encoderFile := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
 		LevelKey:     mylog.LevelKey,
@@ -240,47 +244,47 @@ func setFile(mylog *MyLog) (zapcore.Core, zapcore.Core) {
 }
 
 // D Debug 级别日志输出（空格分隔）
-func (mylog *MyLog) D(args ...interface{}) {
+func (mylog *Log) D(args ...interface{}) {
 	mylog.logWithLevel(zapcore.DebugLevel, " ", args...)
 }
 
 // I Info 级别日志输出（空格分隔）
-func (mylog *MyLog) I(args ...interface{}) {
+func (mylog *Log) I(args ...interface{}) {
 	mylog.logWithLevel(zapcore.InfoLevel, " ", args...)
 }
 
 // W Warn 级别日志输出（空格分隔）
-func (mylog *MyLog) W(args ...interface{}) {
+func (mylog *Log) W(args ...interface{}) {
 	mylog.logWithLevel(zapcore.WarnLevel, " ", args...)
 }
 
 // E Error 级别日志输出（空格分隔）
-func (mylog *MyLog) E(args ...interface{}) {
+func (mylog *Log) E(args ...interface{}) {
 	mylog.logWithLevel(zapcore.ErrorLevel, " ", args...)
 }
 
 // DWithSep Debug 级别日志输出（自定义分隔符）
-func (mylog *MyLog) DWithSep(sep string, args ...interface{}) {
+func (mylog *Log) DWithSep(sep string, args ...interface{}) {
 	mylog.logWithLevel(zapcore.DebugLevel, sep, args...)
 }
 
 // IWithSep Info 级别日志输出（自定义分隔符）
-func (mylog *MyLog) IWithSep(sep string, args ...interface{}) {
+func (mylog *Log) IWithSep(sep string, args ...interface{}) {
 	mylog.logWithLevel(zapcore.InfoLevel, sep, args...)
 }
 
 // WWithSep Warn 级别日志输出（自定义分隔符）
-func (mylog *MyLog) WWithSep(sep string, args ...interface{}) {
+func (mylog *Log) WWithSep(sep string, args ...interface{}) {
 	mylog.logWithLevel(zapcore.WarnLevel, sep, args...)
 }
 
 // EWithSep Error 级别日志输出（自定义分隔符）
-func (mylog *MyLog) EWithSep(sep string, args ...interface{}) {
+func (mylog *Log) EWithSep(sep string, args ...interface{}) {
 	mylog.logWithLevel(zapcore.ErrorLevel, sep, args...)
 }
 
 // logWithLevel 内部实现方法，处理日志级别和分隔符
-func (mylog *MyLog) logWithLevel(level zapcore.Level, sep string, args ...interface{}) {
+func (mylog *Log) logWithLevel(level zapcore.Level, sep string, args ...interface{}) {
 	if len(args) == 0 {
 		return
 	}
