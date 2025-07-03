@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-11-16 19:44:41
- * @LastEditTime: 2025-06-26 13:21:48
+ * @LastEditTime: 2025-07-03 13:43:25
  */
 package goutils
 
@@ -17,8 +17,17 @@ import (
 )
 
 // HexEncode 16 进制字符串转 str
-func Str2Hex(data string) string {
-	return strings.ToUpper(hex.EncodeToString([]byte(data)))
+func Str2Hex[T string | []byte](data T) string {
+	var inputBytes []byte
+
+	switch v := any(data).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
+	}
+
+	return hex.EncodeToString(inputBytes)
 }
 
 // HexDecode str 转 16 进制字符串
