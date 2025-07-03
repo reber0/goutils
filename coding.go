@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-04-28 09:42:42
- * @LastEditTime: 2025-06-26 13:23:09
+ * @LastEditTime: 2025-07-02 16:12:25
  */
 package goutils
 
@@ -13,17 +13,38 @@ import (
 )
 
 // Base64Encode base64 编码
-func Base64Encode(data []byte) string {
-	return base64.StdEncoding.EncodeToString(data)
+func Base64Encode[T string | []byte](data T) string {
+	switch v := any(data).(type) {
+	case string:
+		return base64.StdEncoding.EncodeToString([]byte(v))
+	case []byte:
+		return base64.StdEncoding.EncodeToString(v)
+	default:
+		return "" // 理论上不会发生
+	}
 }
 
 // Base64Decode base64 解码
-func Base64Decode(data string) ([]byte, error) {
-	plainText, err := base64.StdEncoding.DecodeString(data)
-	if err != nil {
-		return nil, err
+func Base64Decode[T string | []byte](data T) (string, error) {
+	var inputBytes []byte
+
+	switch v := any(data).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
 	}
-	return plainText, nil
+
+	// 直接使用 Decode 方法处理字节
+	decodedLen := base64.StdEncoding.DecodedLen(len(inputBytes)) // 计算解码后数据的最大长度
+	output := make([]byte, decodedLen)                           // 创建足够容量的缓冲区
+	n, err := base64.StdEncoding.Decode(output, inputBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// 返回实际解码长度的字符串
+	return string(output[:n]), nil
 }
 
 // URLEncode URL 编码

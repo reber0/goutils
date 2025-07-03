@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-02-14 14:37:10
- * @LastEditTime: 2025-06-26 16:34:14
+ * @LastEditTime: 2025-07-03 13:30:47
  */
 package goutils
 
@@ -24,50 +24,82 @@ import (
 )
 
 // Md5 加密
-func Md5(plainText []byte) string {
+func Md5[T string | []byte](plainText T) string {
+	var inputBytes []byte
+	switch v := any(plainText).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
+	}
+
 	m := md5.New()
-	m.Write(plainText)
+	m.Write(inputBytes)
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha1 加密
-func Sha1(plainText []byte) string {
+func Sha1[T string | []byte](plainText T) string {
+	var inputBytes []byte
+	switch v := any(plainText).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
+	}
+
 	m := sha1.New()
-	m.Write(plainText)
+	m.Write([]byte(inputBytes))
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha256 加密
-func Sha256(plainText []byte) string {
+func Sha256[T string | []byte](plainText T) string {
+	var inputBytes []byte
+	switch v := any(plainText).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
+	}
+
 	m := sha256.New()
-	m.Write(plainText)
+	m.Write([]byte(inputBytes))
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Sha512 加密
-func Sha512(plainText []byte) string {
+func Sha512[T string | []byte](plainText T) string {
+	var inputBytes []byte
+	switch v := any(plainText).(type) {
+	case string:
+		inputBytes = []byte(v)
+	case []byte:
+		inputBytes = v
+	}
+
 	m := sha512.New()
-	m.Write(plainText)
+	m.Write([]byte(inputBytes))
 	return hex.EncodeToString(m.Sum(nil))
 }
 
 // 生成 HMAC-SHA256
-func HMACSHA256(data []byte, key []byte) []byte {
+func HMACSHA256(plainText, key []byte) []byte {
 	h := hmac.New(sha256.New, key)
-	h.Write(data)
+	h.Write(plainText)
 	return h.Sum(nil)
 }
 
-// AES-GCM 加密，返回加密后的数据（包含时间戳）
-func AESGCMEncrypt(plaintext []byte, key []byte) ([]byte, error) {
+// AES-GCM 加密，key 的长度必须为 16, 24 或者 32，返回加密后的数据（包含时间戳）
+func AESGCMEncrypt(plainText, key []byte) ([]byte, error) {
 	// 准备时间戳数据块
 	timestampBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timestampBytes, uint64(time.Now().UnixMilli()))
 
 	// 创建完整数据块: 时间戳 + 实际数据
-	fullData := make([]byte, len(timestampBytes)+len(plaintext))
+	fullData := make([]byte, len(timestampBytes)+len(plainText))
 	copy(fullData[:8], timestampBytes)
-	copy(fullData[8:], plaintext)
+	copy(fullData[8:], plainText)
 
 	// 创建 AES 加密块
 	block, err := aes.NewCipher(key)
@@ -99,7 +131,7 @@ func AESGCMEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 }
 
 // AES-GCM 解密，返回解密后的数据和时间戳
-func AESGCMDecrypt(ciphertext []byte, key []byte) ([]byte, int64, error) {
+func AESGCMDecrypt(ciphertext, key []byte) ([]byte, int64, error) {
 	// 创建加密块
 	block, err := aes.NewCipher(key)
 	if err != nil {
