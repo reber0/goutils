@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-11-16 19:44:41
- * @LastEditTime: 2025-07-03 13:43:25
+ * @LastEditTime: 2025-07-03 15:02:52
  */
 package goutils
 
@@ -16,8 +16,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// HexEncode 16 进制字符串转 str
-func Str2Hex[T string | []byte](data T) string {
+// ToHexStr 将字符串或字节切片转换为十六进制字符串
+func ToHexStr[T string | []byte](data T) string {
 	var inputBytes []byte
 
 	switch v := any(data).(type) {
@@ -30,7 +30,7 @@ func Str2Hex[T string | []byte](data T) string {
 	return hex.EncodeToString(inputBytes)
 }
 
-// HexDecode str 转 16 进制字符串
+// FromHexStr 将十六进制字符串解码为原始字符串
 func Hex2Str(data string) (string, error) {
 	decoded, err := hex.DecodeString(data)
 	if err != nil {
