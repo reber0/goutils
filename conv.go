@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-11-16 19:44:41
- * @LastEditTime: 2025-07-03 15:02:52
+ * @LastEditTime: 2025-07-03 15:10:20
  */
 package goutils
 
@@ -19,20 +19,18 @@ import (
 // ToHexStr 将字符串或字节切片转换为十六进制字符串
 func ToHexStr[T string | []byte](data T) string {
 	var inputBytes []byte
-
 	switch v := any(data).(type) {
 	case string:
 		inputBytes = []byte(v)
 	case []byte:
 		inputBytes = v
 	}
-
 	return hex.EncodeToString(inputBytes)
 }
 
 // FromHexStr 将十六进制字符串解码为原始字符串
-func Hex2Str(data string) (string, error) {
-	decoded, err := hex.DecodeString(data)
+func FromHexStr(hexStr string) (string, error) {
+	decoded, err := hex.DecodeString(hexStr)
 	if err != nil {
 		return "", err
 	}
