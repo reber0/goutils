@@ -2,19 +2,24 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-06-23 16:19:28
+ * @LastEditTime: 2025-07-03 14:20:05
  */
 
 package goutils
 
 import (
+	"fmt"
 	"math/rand"
 	"reflect"
+	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/nsf/termbox-go"
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
+	"github.com/shirou/gopsutil/v4/host"
 )
 
 // RandomInt 获取区间中的一个随机整数，返回数字范围 [min, max]
@@ -167,4 +172,44 @@ func GetRatio(first string, second string) (percent float64) {
 	percent = float64(sim*200) / float64(l1+l2)
 
 	return percent / 100
+}
+
+// 获取设备的 HostID、Cup 信息、系统盘容量
+func GetDeviceSig() string {
+	hostInfo, _ := host.Info()
+	hostID := hostInfo.HostID
+
+	cpuSig := ""
+	cpus, _ := cpu.Info()
+	if len(cpus) > 0 {
+		cpuSig = fmt.Sprintf("%s-%d-%s", cpus[0].ModelName, cpus[0].Cores, cpus[0].VendorID)
+	}
+
+	arch := runtime.GOARCH
+
+	diskSig := ""
+	if sysDiskSize, err := getSystemDiskCapacity(); err == nil {
+		diskSig = fmt.Sprintf("%dGB", sysDiskSize/1024/1024/1024)
+	}
+
+	composite := fmt.Sprintf("%s|%s|%s|%s", hostID, cpuSig, arch, diskSig)
+
+	return composite
+}
+
+func getSystemDiskCapacity() (uint64, error) {
+	var mountPoint string
+	switch runtime.GOOS {
+	case "windows":
+		mountPoint = "C:"
+	default:
+		mountPoint = "/"
+	}
+
+	usage, err := disk.Usage(mountPoint)
+	if err != nil {
+		return 0, err
+	}
+
+	return usage.Total, nil
 }
