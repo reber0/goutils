@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-07-03 14:20:05
+ * @LastEditTime: 2025-07-04 10:13:05
  */
 
 package goutils
@@ -182,7 +182,7 @@ func GetDeviceSig() string {
 	cpuSig := ""
 	cpus, _ := cpu.Info()
 	if len(cpus) > 0 {
-		cpuSig = fmt.Sprintf("%s-%d-%s", cpus[0].ModelName, cpus[0].Cores, cpus[0].VendorID)
+		cpuSig = fmt.Sprintf("%s_%d_%s", cpus[0].ModelName, cpus[0].Cores, cpus[0].VendorID)
 	}
 
 	arch := runtime.GOARCH
