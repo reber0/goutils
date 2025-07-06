@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-01 23:13:37
- * @LastEditTime: 2025-06-26 13:22:32
+ * @LastEditTime: 2025-07-06 15:34:29
  */
 package goutils
 
@@ -12,13 +12,19 @@ import (
 )
 
 // FileGetContents 获取文件内容
-func FileGetContents(filename string) (string, error) {
+func FileGetContents(filename string) ([]byte, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 
-	return string(content), nil
+	return content, nil
+}
+
+// FilePutContents 读取文件内容
+func FilePutContents(filename string, content []byte) error {
+	err := os.WriteFile(filename, content, 0644)
+	return err
 }
 
 // FileEachLineRead 按行读取文件内容
