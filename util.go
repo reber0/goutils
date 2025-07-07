@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-07-04 10:13:05
+ * @LastEditTime: 2025-07-07 17:05:25
  */
 
 package goutils
@@ -33,6 +33,14 @@ func RandomInt(min, max int) int {
 //	temStr := RandomString(12)
 //	fmt.Println(temStr) // 7U8#+SgVNX+b
 func RandomString(length int) string {
+	return string(RandomByte(length))
+}
+
+// RandomByte 获取指定长度的随机字符(数字+大小写字母)
+//
+//	temByte := RandomByte(6)
+//	fmt.Println(temByte) // [68 106 84 51 64 83]
+func RandomByte(length int) []byte {
 	digits := "23456789"
 	lowerCase := "abcdefghijkmnpqrstuvwxyz"
 	upperCase := "ABCDEFGHJKLMNPQRSTUVWXYZ"
@@ -41,12 +49,12 @@ func RandomString(length int) string {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano())) // 使用安全的随机数生成器
 
-	result := make([]byte, length)
-
-	// 如果长度小于4，自动调整为4
+	// 如果长度小于 4，自动调整为 4
 	if length < 4 {
 		length = 4
 	}
+
+	result := make([]byte, length)
 
 	// 生成必备字符
 	result[0] = digits[r.Intn(len(digits))]
@@ -65,7 +73,7 @@ func RandomString(length int) string {
 		result[i], result[j] = result[j], result[i]
 	}
 
-	return string(result)
+	return result
 }
 
 // Str2Unix 将时间字符串转化为东八区时间戳
