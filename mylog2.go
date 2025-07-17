@@ -2,12 +2,13 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2023-10-12 17:55:40
- * @LastEditTime: 2023-11-22 16:13:46
+ * @LastEditTime: 2025-07-17 16:51:00
  */
 package goutils
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/mattn/go-colorable"
@@ -16,29 +17,33 @@ import (
 var stdout = colorable.NewColorableStderr()
 
 const (
-	red    = "\033[31m"
-	green  = "\033[32m"
-	yellow = "\033[33m"
-	blue   = "\033[34m"
-	reset  = "\033[0m"
+	colorReset  = "\033[0m"
+	colorRed    = "\033[31m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorBlue   = "\033[34m"
 )
 
-func Red(msg string) {
+func Red(args ...interface{})    { colorPrint(colorRed, args...) }
+func Green(args ...interface{})  { colorPrint(colorGreen, args...) }
+func Yellow(args ...interface{}) { colorPrint(colorYellow, args...) }
+func Blue(args ...interface{})   { colorPrint(colorBlue, args...) }
+
+func colorPrint(colorCode string, args ...interface{}) {
 	t := time.Now().Format("15:04:05")
-	fmt.Fprintf(stdout, "[%s] %s%s%s\n", t, red, msg, reset)
+	msg := joinArgs(" ", args...)
+	fmt.Fprintf(stdout, "[%s] %s%s%s\n", t, colorCode, msg, colorReset)
 }
 
-func Green(msg string) {
-	t := time.Now().Format("15:04:05")
-	fmt.Fprintf(stdout, "[%s] %s%s%s\n", t, green, msg, reset)
-}
-
-func Yellow(msg string) {
-	t := time.Now().Format("15:04:05")
-	fmt.Fprintf(stdout, "[%s] %s%s%s\n", t, yellow, msg, reset)
-}
-
-func Blue(msg string) {
-	t := time.Now().Format("15:04:05")
-	fmt.Fprintf(stdout, "[%s] %s%s%s\n", t, blue, msg, reset)
+func joinArgs(sep string, args ...interface{}) string {
+	// 处理多参数连接，连接多个参数为字符串
+	var b strings.Builder
+	for i, arg := range args {
+		if i > 0 {
+			b.WriteString(sep) // 添加分隔符
+		}
+		fmt.Fprint(&b, arg) // 格式化为字符串
+	}
+	msg := b.String()
+	return msg
 }
