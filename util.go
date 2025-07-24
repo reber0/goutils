@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2021-11-10 09:48:35
- * @LastEditTime: 2025-07-07 17:05:25
+ * @LastEditTime: 2025-07-24 12:07:13
  */
 
 package goutils
@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/nsf/termbox-go"
@@ -190,7 +191,7 @@ func GetDeviceSig() string {
 	cpuSig := ""
 	cpus, _ := cpu.Info()
 	if len(cpus) > 0 {
-		cpuSig = fmt.Sprintf("%s_%d_%s", cpus[0].ModelName, cpus[0].Cores, cpus[0].VendorID)
+		cpuSig = fmt.Sprintf("%s %d %s", cpus[0].ModelName, cpus[0].Cores, cpus[0].VendorID)
 	}
 
 	arch := runtime.GOARCH
@@ -202,7 +203,7 @@ func GetDeviceSig() string {
 
 	composite := fmt.Sprintf("%s|%s|%s|%s", hostID, cpuSig, arch, diskSig)
 
-	return composite
+	return strings.ReplaceAll(composite, " ", "_")
 }
 
 func getSystemDiskCapacity() (uint64, error) {
