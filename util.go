@@ -130,7 +130,8 @@ func Unix2Str(timestamp interface{}) (string, error) {
 // GetTermWidth 获取终端宽度
 func GetTermWidth() int {
 	if err := termbox.Init(); err != nil {
-		panic(err)
+		// 非交互环境（无 tty）下返回默认宽度，不 panic
+		return 80
 	}
 	width, _ := termbox.Size()
 	termbox.Close()
