@@ -8,7 +8,6 @@ package goutils
 
 import (
 	"fmt"
-	"net"
 	"net/url"
 	"path"
 	"strconv"
@@ -21,15 +20,21 @@ type URL struct {
 }
 
 // NewURL 解析 URL
-func NewURL(targetURL string) *URL {
+//
+//	url, err := goutils.NewURL("https://example.com/path?key=value")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Println(url.BaseURL())
+func NewURL(targetURL string) (*URL, error) {
 	urlObj, err := url.Parse(targetURL)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return &URL{
 		u: urlObj,
-	}
+	}, nil
 }
 
 // BaseURL 获取 BaseURL
@@ -55,15 +60,14 @@ func (p *URL) Password() string {
 
 // Host 获取 Host
 func (p *URL) Host() string {
-	Host, _, _ := net.SplitHostPort(p.u.Host)
-	return Host
+	return p.u.Hostname()
 }
 
 // Port 获取 Port
 func (p *URL) Port() int {
-	_, Port, _ := net.SplitHostPort(p.u.Host)
-	port, _ := strconv.Atoi(Port)
-	return port
+	port := p.u.Port()
+	pn, _ := strconv.Atoi(port)
+	return pn
 }
 
 // Path 获取 Path

@@ -48,7 +48,7 @@ func RandomByte(length int) []byte {
 	specialChars := "!@#$%^&*_-+="
 	allChars := digits + lowerCase + upperCase + specialChars
 
-	r := rand.New(rand.NewSource(time.Now().UnixNano())) // 使用安全的随机数生成器
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// 如果长度小于 4，自动调整为 4
 	if length < 4 {

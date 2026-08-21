@@ -41,7 +41,7 @@ func IsInCol(collection interface{}, elem interface{}) bool {
 			}
 		}
 	default:
-		panic("haystack: haystack type muset be slice, array or map")
+		panic("haystack: haystack type must be slice, array or map")
 	}
 
 	return false

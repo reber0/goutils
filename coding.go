@@ -9,7 +9,7 @@ package goutils
 import (
 	"encoding/base64"
 	"net/url"
-	"regexp"
+	"strings"
 )
 
 // Base64Encode base64 编码
@@ -63,31 +63,23 @@ func URLDecode(data string) (string, error) {
 }
 
 // HTMLEntityEncode html 实体编码
+// 注意：& 必须先编码，否则编码后的实体会被二次编码
 func HTMLEntityEncode(data string) string {
-	reg1 := regexp.MustCompile(`&`)
-	reg2 := regexp.MustCompile(`<`)
-	reg3 := regexp.MustCompile(`>`)
-	reg4 := regexp.MustCompile(`'`)
-	reg5 := regexp.MustCompile(`"`)
-	data = reg1.ReplaceAllString(data, "&amp;")
-	data = reg2.ReplaceAllString(data, "&lt;")
-	data = reg3.ReplaceAllString(data, "&gt;")
-	data = reg4.ReplaceAllString(data, "&apos;")
-	data = reg5.ReplaceAllString(data, "&quot;")
+	data = strings.ReplaceAll(data, "&", "&amp;") // & 先编码，防止二次编码
+	data = strings.ReplaceAll(data, "<", "&lt;")
+	data = strings.ReplaceAll(data, ">", "&gt;")
+	data = strings.ReplaceAll(data, "'", "&apos;")
+	data = strings.ReplaceAll(data, "\"", "&quot;")
 	return data
 }
 
 // HTMLEntityDecode html 实体解码
+// 注意：&amp; 必须最后解码，否则会导致二次解码（如 &amp;lt; → &lt; → <）
 func HTMLEntityDecode(data string) string {
-	reg1 := regexp.MustCompile(`&amp;`)
-	reg2 := regexp.MustCompile(`&lt;`)
-	reg3 := regexp.MustCompile(`&gt;`)
-	reg4 := regexp.MustCompile(`&apos;`)
-	reg5 := regexp.MustCompile(`&quot;`)
-	data = reg1.ReplaceAllString(data, "&")
-	data = reg2.ReplaceAllString(data, "<")
-	data = reg3.ReplaceAllString(data, ">")
-	data = reg4.ReplaceAllString(data, "'")
-	data = reg5.ReplaceAllString(data, "\"")
+	data = strings.ReplaceAll(data, "&lt;", "<")
+	data = strings.ReplaceAll(data, "&gt;", ">")
+	data = strings.ReplaceAll(data, "&apos;", "'")
+	data = strings.ReplaceAll(data, "&quot;", "\"")
+	data = strings.ReplaceAll(data, "&amp;", "&") // &amp; 最后解码，防止二次解码
 	return data
 }

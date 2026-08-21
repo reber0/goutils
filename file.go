@@ -21,7 +21,7 @@ func FileGetContents(filename string) ([]byte, error) {
 	return content, nil
 }
 
-// FilePutContents 读取文件内容
+// FilePutContents 写入文件内容
 func FilePutContents(filename string, content []byte) error {
 	err := os.WriteFile(filename, content, 0644)
 	return err

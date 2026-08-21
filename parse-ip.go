@@ -2,7 +2,7 @@
  * @Author: reber
  * @Mail: reber0ask@qq.com
  * @Date: 2022-06-20 16:49:14
- * @LastEditTime: 2025-06-26 13:28:35
+ * @LastEditTime: 2026-08-21 16:05:33
  */
 package goutils
 
@@ -33,10 +33,12 @@ func ParseIP(target string) []string {
 	re1 := regexp.MustCompile(template1)
 	re2 := regexp.MustCompile(template2)
 	re3 := regexp.MustCompile(template3)
+	// 用于从 IP 范围格式（如 1.1.1.1-10）中提取前缀和起止数字
+	reRange := regexp.MustCompile(`(\d{1,3}\.\d{1,3}\.\d{1,3}\.)(\d{1,3})-(\d{1,3})`)
 
 	tmpS := strings.Split(strings.ReplaceAll(target, " ", ""), ",")
 	for _, s := range tmpS {
-		switch true {
+		switch {
 		case re1.MatchString(s):
 			p, err := parse1(s)
 			if err != nil {
@@ -45,8 +47,7 @@ func ParseIP(target string) []string {
 			}
 			ips = append(ips, p...)
 		case re2.MatchString(s):
-			reg := regexp.MustCompile(`(\d{1,3}\.\d{1,3}\.\d{1,3}\.)(\d{1,3})-(\d{1,3})`)
-			res := reg.FindStringSubmatch(s)
+			res := reRange.FindStringSubmatch(s)
 			prev, x, y := res[1], res[2], res[3]
 			start, _ := strconv.Atoi(x)
 			end, _ := strconv.Atoi(y)

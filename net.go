@@ -13,9 +13,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -23,8 +24,8 @@ import (
 	"golang.org/x/text/transform"
 )
 
-// IsSiteLive 判断网站是否存活
-func IsSiteALive(url string) bool {
+// IsSiteAlive 判断网站是否存活
+func IsSiteAlive(url string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
@@ -43,62 +44,107 @@ func IsSiteALive(url string) bool {
 	return true // 任何HTTP响应状态码均视为存活
 }
 
-// IsPortOpenSyn 判断端口是否 open
+// IsPortOpenSyn 通过 SYN 半开扫描判断端口是否 open（需要 root/管理员权限）
+//
+//	ip := "1.1.1.1"
+//	port := "80"
+//	isOpen := IsPortOpenSyn(ip, port)
 func IsPortOpenSyn(ip, port string) bool {
-	var synAckReceived int
-	var tcpHeader struct {
-		SourcePort           uint16
-		DestinationPort      uint16
-		SequenceNumber       uint32
-		AcknowledgmentNumber uint32
-		DataOffset           uint8
-		Reserved             uint8
-		TCPFlags             uint8
-		WindowSize           uint16
-		Checksum             uint16
-		UrgentPointer        uint16
+	dstPort, err := strconv.Atoi(port)
+	if err != nil || dstPort < 1 || dstPort > 65535 {
+		return false
 	}
 
-	// 请求 3 次，减少错误判断的概率
-	for i := 0; i < 3; i++ {
-		// 创建 TCP 套接字
-		conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), 3*time.Second)
+	dstIP := net.ParseIP(ip)
+	if dstIP == nil || dstIP.To4() == nil {
+		return false // 仅支持 IPv4
+	}
+
+	// 构造 TCP SYN 包
+	tcpHeader := makeTCPHeader(uint16(rand.Intn(64512)+1024), uint16(dstPort), rand.Uint32(), 0, 0x02)
+	ipHeader := makeIPHeader(dstIP, tcpHeader)
+	synPacket := append(ipHeader, tcpHeader...)
+
+	// 发送 SYN 并等待响应
+	return sendSynAndWait(dstIP, synPacket, 3*time.Second)
+}
+
+// makeTCPHeader 构造 TCP 头部（20 字节，不含选项和数据）
+func makeTCPHeader(srcPort, dstPort uint16, seq, ack uint32, flags uint8) []byte {
+	header := make([]byte, 20)
+	binary.BigEndian.PutUint16(header[0:2], srcPort)
+	binary.BigEndian.PutUint16(header[2:4], dstPort)
+	binary.BigEndian.PutUint32(header[4:8], seq)
+	binary.BigEndian.PutUint32(header[8:12], ack)
+	header[12] = 5 << 4 // data offset (5 * 4 = 20 bytes, no options)
+	header[13] = flags
+	binary.BigEndian.PutUint16(header[14:16], 65535) // window size
+	// checksum 和 urgent pointer 留 0，raw socket 层不校验
+	return header
+}
+
+// makeIPHeader 构造 IPv4 头部（20 字节）
+func makeIPHeader(dstIP net.IP, payload []byte) []byte {
+	header := make([]byte, 20)
+	header[0] = 0x45 // version=4, IHL=5 (20 bytes)
+	header[1] = 0x00 // DSCP/ECN
+	totalLen := 20 + len(payload)
+	binary.BigEndian.PutUint16(header[2:4], uint16(totalLen))
+	binary.BigEndian.PutUint16(header[4:6], 0) // identification
+	binary.BigEndian.PutUint16(header[6:8], 0) // flags/fragment offset
+	header[8] = 64                              // TTL
+	header[9] = 6                               // protocol = TCP
+	binary.BigEndian.PutUint16(header[10:12], 0) // checksum (OS 填)
+	// src IP 留 0.0.0.0，OS 会填
+	copy(header[12:16], dstIP.To4())
+	return header
+}
+
+// sendSynAndWait 发送 SYN 包并等待响应
+func sendSynAndWait(dstIP net.IP, synPacket []byte, timeout time.Duration) bool {
+	conn, err := net.DialTimeout("ip4:tcp", dstIP.String(), timeout)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+
+	// 设置写超时
+	if err := conn.SetWriteDeadline(time.Now().Add(timeout)); err != nil {
+		return false
+	}
+
+	// 发送 SYN
+	if _, err := conn.Write(synPacket); err != nil {
+		return false
+	}
+
+	// 等待响应
+	if err := conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
+		return false
+	}
+
+	buf := make([]byte, 1024)
+	for {
+		n, err := conn.Read(buf)
 		if err != nil {
-			if strings.Contains(err.Error(), "i/o timeout") {
-				return false
-			}
-			if strings.Contains(err.Error(), "connect: connection refused") {
-				return false
-			}
-		} else {
-			// 使用半开技术
-			conn.Write([]byte{0x02})       // 发送 SYN 包建立连接
-			conn.Write([]byte{0x04, 0x02}) // 立即发送 RST 以关闭连接
-
-			// 接收响应数据包
-			data := make([]byte, 100)
-			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-			conn.Read(data)
-
-			// 解析 TCP 头部信息
-			buf := bytes.Buffer{}
-			buf.Write(data[:20])
-			binary.Read(&buf, binary.BigEndian, &tcpHeader)
-
-			if (tcpHeader.TCPFlags & 0x12) == 0x12 {
-				// 没有收到 SYN+ACK 响应,端口关闭
-			} else {
-				synAckReceived++
-			}
+			return false
 		}
 
-		conn.Close()
-	}
+		// 响应数据至少 40 字节（IP 头 20 + TCP 头 20）
+		if n < 40 {
+			continue
+		}
 
-	if synAckReceived == 3 {
-		return true
-	} else {
-		return false
+		// 解析 TCP flags（IP 头后第 13 字节）
+		tcpFlags := buf[20+13]
+		// SYN+ACK = 0x12
+		if tcpFlags&0x12 == 0x12 {
+			return true
+		}
+		// RST = 0x04，端口关闭
+		if tcpFlags&0x04 != 0 {
+			return false
+		}
 	}
 }
 
@@ -147,7 +193,7 @@ func EncodeToUTF8(resp *resty.Response) string {
 	return string(body)
 }
 
-// RandomUserAgent 随机生成 X-Forwarded-For
+// RandomUserAgent 随机生成 User-Agent
 func RandomUserAgent() string {
 	userAgent := []string{
 		"Mozilla/5.0 (iPhone; CPU iPhone OS 15_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/100.0.4896.77 Mobile/15E148 Safari/604.1",
