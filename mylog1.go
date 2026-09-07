@@ -8,6 +8,7 @@ package goutils
 
 import (
 	"os"
+	"time"
 
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
@@ -204,7 +205,10 @@ func setFile(mylog *Log) (zapcore.Core, zapcore.Core) {
 		TimeKey:      mylog.TimeKey,
 		CallerKey:    mylog.CallerKey,
 		MessageKey:   mylog.MessageKey,
-		EncodeTime:   zapcore.ISO8601TimeEncoder,
+		// ISO8601TimeEncoder 输出 2026-09-07T10:38:07.123+0800；改用与 pyutils.mylog 一致的秒级本地时间
+		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(t.Format("2006-01-02 15:04:05"))
+		},
 		EncodeLevel:  zapcore.CapitalLevelEncoder,
 		EncodeCaller: zapcore.ShortCallerEncoder, // 显示短文件路径
 		// EncodeCaller: zapcore.FullCallerEncoder, // 显示完整文件路径
