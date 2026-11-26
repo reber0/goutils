@@ -106,22 +106,10 @@ func (mylog *Log) L() *zap.Logger {
 	return log
 }
 
-// SetInfoFile 设置 Info 日志路径
-func (mylog *Log) SetInfoFile(logfile string) *Log {
-	mylog.InfoFile = logfile
-	return mylog
-}
-
 // SetLogPath 设置日志目录，文件名固定为 info.log / error.log
 func (mylog *Log) SetLogPath(dir string) *Log {
 	mylog.InfoFile = filepath.Join(dir, defaultInfoFile)
 	mylog.ErrorFile = filepath.Join(dir, defaultErrorFile)
-	return mylog
-}
-
-// SetErrorFile 设置 Error 日志路径
-func (mylog *Log) SetErrorFile(logfile string) *Log {
-	mylog.ErrorFile = logfile
 	return mylog
 }
 
