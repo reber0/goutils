@@ -16,7 +16,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// 默认日志目录与文件名，NewLog 与 SetInfoPath 共用
+// 默认日志目录与文件名，NewLog 与 SetLogPath 共用
 const (
 	defaultLogDir    = "./logs"
 	defaultInfoFile  = "info.log"
@@ -112,8 +112,8 @@ func (mylog *Log) SetInfoFile(logfile string) *Log {
 	return mylog
 }
 
-// SetInfoPath 设置日志目录，文件名固定为 info.log / error.log
-func (mylog *Log) SetInfoPath(dir string) *Log {
+// SetLogPath 设置日志目录，文件名固定为 info.log / error.log
+func (mylog *Log) SetLogPath(dir string) *Log {
 	mylog.InfoFile = filepath.Join(dir, defaultInfoFile)
 	mylog.ErrorFile = filepath.Join(dir, defaultErrorFile)
 	return mylog
