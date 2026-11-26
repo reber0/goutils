@@ -8,6 +8,7 @@ package goutils
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -101,6 +102,13 @@ func (mylog *Log) L() *zap.Logger {
 // SetInfoFile 设置 Info 日志路径
 func (mylog *Log) SetInfoFile(logfile string) *Log {
 	mylog.InfoFile = logfile
+	return mylog
+}
+
+// SetInfoPath 设置日志目录，文件名固定为 info.log / error.log
+func (mylog *Log) SetInfoPath(dir string) *Log {
+	mylog.InfoFile = filepath.Join(dir, "info.log")
+	mylog.ErrorFile = filepath.Join(dir, "error.log")
 	return mylog
 }
 
