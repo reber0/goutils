@@ -66,7 +66,7 @@ func NewLog() *Log {
 		MessageKey: "msg",
 
 		MaxSize:    10,
-		MaxBackups: 50,
+		MaxBackups: 10,
 		MaxAge:     30,
 		Compress:   false,
 	}
